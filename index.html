@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LexiGlobal AI - 全球全栈法律枢纽</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #3b82f6;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --bg: #f8fafc;
+            --sidebar-w: 260px;
+            --glass: rgba(255, 255, 255, 0.8);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        body { background: var(--bg); color: var(--primary); display: flex; min-height: 100vh; overflow-x: hidden; }
+        
+        /* 侧边栏魔改 */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: var(--primary);
+            color: white;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        }
+
+        .logo-box { font-size: 24px; font-weight: 800; margin-bottom: 50px; background: linear-gradient(to right, #3b82f6, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px; }
+
+        .nav-link {
+            padding: 14px 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            color: #94a3b8;
+            display: flex; align-items: center; gap: 12px;
+            text-decoration: none;
+        }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; transform: translateX(5px); }
+        .nav-link.active { background: var(--accent); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
+
+        /* 主体 */
+        .main { margin-left: var(--sidebar-w); flex: 1; padding: 40px; position: relative; }
+
+        /* 顶部语言枢纽 */
+        .top-hub {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;
+            background: var(--glass); backdrop-filter: blur(10px); padding: 15px 25px; border-radius: 15px;
+            border: 1px solid white; sticky: top;
+        }
+
+        .lang-control {
+            display: flex; align-items: center; gap: 15px;
+        }
+
+        select { padding: 10px 15px; border-radius: 10px; border: 1px solid #e2e8f0; outline: none; background: white; font-weight: 600; cursor: pointer; }
+
+        /* 创新卡片系统 */
+        .card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid #f1f5f9; }
+        
+        /* 可视化热图 */
+        .heatmap { height: 12px; width: 100%; background: #e2e8f0; border-radius: 6px; margin: 20px 0; overflow: hidden; display: flex; }
+        .heat-high { background: var(--danger); width: 20%; }
+        .heat-mid { background: var(--warning); width: 30%; }
+        .heat-safe { background: var(--success); width: 50%; }
+
+        /* 镜像对标编辑器 */
+        .mirror-editor { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .editor-pane { display: flex; flex-direction: column; }
+        textarea { width: 100%; height: 400px; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.6; resize: none; background: #fafafa; }
+
+        /* 按钮悬浮 */
+        .btn { padding: 12px 25px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; justify-content: center; }
+        .btn-ai { background: linear-gradient(135deg, #2563eb, #7c3aed); color: white; width: 100%; margin-top: 15px; }
+        .btn-ai:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 10px 15px rgba(37, 99, 235, 0.3); }
+
+        /* 状态动画 */
+        .pulse { animation: pulse-animation 2s infinite; }
+        @keyframes pulse-animation { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* RTL 逻辑 */
+        body.rtl { direction: rtl; text-align: right; }
+        body.rtl .sidebar { right: 0; border-left: 1px solid rgba(255,255,255,0.1); }
+        body.rtl .main { margin-right: var(--sidebar-w); margin-left: 0; }
+        body.rtl .nav-link:hover { transform: translateX(-5px); }
+
+        /* 响应式隐藏预览标题 */
+        .preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+
+        /* 归档样式 */
+        .archive-item { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid #f1f5f9; }
+        .archive-item:last-child { border: none; }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo-box">LEXIGLOBAL AI</div>
+        <div class="nav-link active" onclick="showPage('dash')" data-tid="m_dash">📊 全球仪表盘</div>
+        <div class="nav-link" onclick="showPage('ocr')" data-tid="m_ocr">👁️ 跨语种透视</div>
+        <div class="nav-link" onclick="showPage('gen')" data-tid="m_gen">✍️ 镜像编辑器</div>
+        <div class="nav-link" onclick="showPage('archive')" data-tid="m_archive">🗄️ 智能归档</div>
+    </aside>
+
+    <main class="main">
+        <header class="top-hub">
+            <h2 id="pageTitle" data-tid="m_dash">全球仪表盘</h2>
+            <div class="lang-control">
+                <span style="font-size: 14px; color: #64748b;" data-tid="select_lang">全系统语言切换:</span>
+                <select id="langSelect" onchange="applyGlobalLang()">
+                    <option value="zh">🇨🇳 中文 (简体)</option>
+                    <option value="en">🇺🇸 English (US)</option>
+                    <option value="ru">🇷🇺 Русский</option>
+                    <option value="ar">🇸🇦 العربية</option>
+                    <option value="ug">☪️ ئۇيغۇر تىلى</option>
+                    <option value="kk">🇰🇿 Қازاقشا</option>
+                    <option value="ja">🇯🇵 日本語</option>
+                    <option value="fr">🇫🇷 Français</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- 1. 仪表盘 -->
+        <div id="page_dash" class="page-content">
+            <div class="card" style="background: linear-gradient(45deg, #0f172a, #1e293b); color: white;">
+                <h1 data-tid="welcome_h">欢迎进入全球法律自治系统</h1>
+                <p style="opacity: 0.7; margin-top: 10px;" data-tid="welcome_p">LexiGlobal AI 正在监控您的全球业务安全。当前已连接 15 个国际法律数据库。</p>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                <div class="card">
+                    <h4 data-tid="stat_1">合规健康度</h4>
+                    <div class="heatmap"><div class="heat-safe"></div><div class="heat-mid"></div></div>
+                    <span style="font-size: 24px; font-weight: 800; color: var(--success);">94.2%</span>
+                </div>
+                <div class="card">
+                    <h4 data-tid="stat_2">待处理风险</h4>
+                    <div class="heatmap"><div class="heat-high" style="width: 80%;"></div></div>
+                    <span style="font-size: 24px; font-weight: 800; color: var(--danger);">12</span>
+                </div>
+                <div class="card">
+                    <h4 data-tid="stat_3">语言覆盖</h4>
+                    <div style="font-size: 24px; font-weight: 800; margin-top: 25px;">100+ Languages</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. OCR 透视 -->
+        <div id="page_ocr" class="page-content" style="display:none;">
+            <div class="card">
+                <div class="preview-header">
+                    <h3 data-tid="ocr_h">跨语种透视风险识别</h3>
+                    <span class="pulse" style="color: var(--accent); font-weight: bold;" data-tid="ai_online">AI 实时扫描中</span>
+                </div>
+                <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap: 30px;">
+                    <div>
+                        <div id="dropZone" style="border: 2px dashed #3b82f6; border-radius: 20px; padding: 60px; text-align: center; background: #eff6ff; cursor: pointer;">
+                            <span style="font-size: 50px;">📄</span>
+                            <p style="margin-top: 15px; font-weight: 600;" data-tid="ocr_p">拖入合同图片或扫描件 (支持任何语言)</p>
+                        </div>
+                        <div style="margin-top: 25px;">
+                            <label style="font-weight: bold;" data-tid="ocr_res">文字提取结果：</label>
+                            <div id="ocrRes" style="margin-top: 10px; background: #f1f5f9; padding: 20px; border-radius: 12px; min-height: 100px;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-weight: bold;" data-tid="ocr_analysis">AI 风险热图分析报告：</label>
+                        <div id="riskReport" style="margin-top: 10px;">
+                            <div style="text-align:center; padding-top: 50px; color: #94a3b8;" data-tid="waiting">等待文件上传...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 镜像编辑器 -->
+        <div id="page_gen" class="page-content" style="display:none;">
+            <div class="card">
+                <div class="preview-header">
+                    <h3 data-tid="m_gen">双语镜像编辑器</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn" style="background: #f1f5f9;" data-tid="btn_copy">复制</button>
+                        <button class="btn btn-primary" onclick="simulateGen()" data-tid="btn_ai_run">AI 润色生成</button>
+                    </div>
+                </div>
+                <div class="mirror-editor">
+                    <div class="editor-pane">
+                        <label style="margin-bottom: 8px; font-weight: bold;" data-tid="label_source">母语需求 (Source)</label>
+                        <textarea id="sourceText" placeholder="请输入您的合同要求，例如：一份为期一年的租房协议，押一付三..."></textarea>
+                    </div>
+                    <div class="editor-pane">
+                        <label style="margin-bottom: 8px; font-weight: bold;" data-tid="label_target">镜像生成 (Mirror Output)</label>
+                        <textarea id="targetText" readonly placeholder="AI 将在此处实时同步生成多语种法律文本..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 智能归档 -->
+        <div id="page_archive" class="page-content" style="display:none;">
+            <div class="card">
+                <h3 data-tid="m_archive">智能云归档</h3>
+                <div style="margin-top: 20px;">
+                    <div class="archive-item">
+                        <span><strong>2024-Global-001.pdf</strong> (租赁合同 - 中英)</span>
+                        <span style="color: var(--success); font-weight: bold;">Safe</span>
+                    </div>
+                    <div class="archive-item">
+                        <span><strong>2024-Trade-009.docx</strong> (跨境贸易 - 中维)</span>
+                        <span style="color: var(--warning); font-weight: bold;">Warning</span>
+                    </div>
+                    <div class="archive-item">
+                        <span><strong>Employee-Standard.pdf</strong> (雇佣合同 - 俄语)</span>
+                        <span style="color: var(--success); font-weight: bold;">Safe</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 超全量全球翻译数据库
+        const translations = {
+            zh: {
+                m_dash: "📊 全球仪表盘", m_ocr: "👁️ 跨语种透视", m_gen: "✍️ 镜像编辑器", m_archive: "🗄️ 智能归档",
+                select_lang: "系统语言切换:", welcome_h: "欢迎进入全球法律自治系统", welcome_p: "LexiGlobal AI 正在监控您的全球业务安全。当前已连接 15 个国际法律数据库。",
+                stat_1: "合规健康度", stat_2: "待处理风险", stat_3: "语言覆盖", ocr_h: "跨语种透视风险识别",
+                ai_online: "AI 实时扫描中", ocr_p: "拖入合同图片或扫描件 (支持任何语言)", ocr_res: "文字提取结果：",
+                ocr_analysis: "AI 风险热图分析报告：", waiting: "等待文件上传...", label_source: "母语需求 (Source)",
+                label_target: "镜像生成 (Mirror Output)", btn_copy: "复制内容", btn_ai_run: "AI 润色生成",
+                res_mock: "正在分析全球法典库...", risk_high: "🚩 发现高危条款：", risk_fix: "✅ AI 修复建议："
+            },
+            en: {
+                m_dash: "📊 Dashboard", m_ocr: "👁️ OCR Nexus", m_gen: "✍️ Mirror Editor", m_archive: "🗄️ Archive",
+                select_lang: "System Language:", welcome_h: "Welcome to LexiGlobal Hub", welcome_p: "AI is monitoring your global business safety across 15 jurisdictions.",
+                stat_1: "Compliance Health", stat_2: "Pending Risks", stat_3: "Language Reach", ocr_h: "Cross-Lingual Risk Scan",
+                ai_online: "AI Engine Online", ocr_p: "Drop contract images or scans here (All Languages)", ocr_res: "Extracted Content:",
+                ocr_analysis: "AI Heatmap & Analysis:", waiting: "Waiting for upload...", label_source: "Source Needs",
+                label_target: "Mirror Output", btn_copy: "Copy", btn_ai_run: "AI Generate",
+                res_mock: "Analyzing global legal database...", risk_high: "🚩 Critical Risk Found:", risk_fix: "✅ AI Recommended Clause:"
+            },
+            ug: {
+                m_dash: "📊 باشقۇرۇش تاختىسى", m_ocr: "👁️ تىل ھالقىغان پەرقلەندۈرۈش", m_gen: "✍️ ئەينەك تەھرىرلىگۈچ", m_archive: "🗄️ ئەقلىي ئارخىپ",
+                select_lang: "سىستېما تىلى:", welcome_h: "يەرشارى قانۇن ئاپتونومىيە سىستېمىسىغا مەرھەمەت", welcome_p: "LexiGlobal AI سىزنىڭ يەرشارى سودا بىخەتەرلىكىڭىزنى نازارەت قىلماقتا.",
+                stat_1: "ماسلىشىشچانلىقى", stat_2: "بىر تەرەپ قىلىنمىغان خەتەر", stat_3: "تىل قاپلىنىشى", ocr_h: "سۈرەتتىن خەتەر پەرقلەندۈرۈش",
+                ai_online: "AI توردا", ocr_p: "توختام سۈرىتىنى بۇ يەرگە تاشلاڭ", ocr_res: "تېكىست نەتىجىسى:",
+                ocr_analysis: "AI تەھلىل دوكلاتى:", waiting: "ھۆججەت كۈتۈۋاتىدۇ...", label_source: "ئانا تىلدىكى ئېھتىياج",
+                label_target: "ئەينەك كۆچۈرمە", btn_copy: "كۆچۈرۈش", btn_ai_run: "AI تۈزۈش"
+            },
+            ar: {
+                m_dash: "📊 لوحة القيادة", m_ocr: "👁️ نكسوس اللغات", m_gen: "✍️ محرر المرآة", m_archive: "الأرشيف",
+                select_lang: "لغة النظام:", welcome_h: "مرحباً بك في نظام القانون العالمي", welcome_p: "الذكاء الاصطناعي يراقب سلامة أعمالك العالمية عبر 15 ولاية قضائية.",
+                stat_1: "الصحة القانونية", stat_2: "المخاطر المعلقة", stat_3: "تغطية اللغات", ocr_h: "فحص المخاطر العابر للغات",
+                ai_online: "المحرك نشط", ocr_p: "اسحب صور العقود هنا (جميع اللغات)", ocr_res: "المحتوى المستخرج:",
+                ocr_analysis: "تحليل خريطة المخاطر:", waiting: "بانتظار التحميل...", label_source: "الاحتياجات المصدرية",
+                label_target: "مخرجات المرآة", btn_copy: "نسخ", btn_ai_run: "توليد الذكاء"
+            }
+        };
+
+        // 全量切换语言引擎
+        function applyGlobalLang() {
+            const lang = document.getElementById('langSelect').value;
+            const dict = translations[lang] || translations['en'];
+
+            // 1. 翻译所有带 data-tid 的元素
+            document.querySelectorAll('[data-tid]').forEach(el => {
+                const key = el.getAttribute('data-tid');
+                if (dict[key]) {
+                    el.innerText = dict[key];
+                }
+            });
+
+            // 2. 翻译侧边栏并更新标题
+            const activeNav = document.querySelector('.nav-link.active');
+            document.getElementById('pageTitle').innerText = activeNav.innerText;
+
+            // 3. 处理 RTL (阿、维语)
+            if (['ar', 'ug'].includes(lang)) {
+                document.body.classList.add('rtl');
+            } else {
+                document.body.classList.remove('rtl');
+            }
+
+            // 4. 翻译 Placeholder
+            const sourceArea = document.getElementById('sourceText');
+            if(lang === 'zh') sourceArea.placeholder = "请输入您的合同要求...";
+            else if(lang === 'en') sourceArea.placeholder = "Enter your contract requirements...";
+            else if(lang === 'ug') sourceArea.placeholder = "توختام ئېھتىياجىڭىزنى كىرگۈزۈڭ...";
+        }
+
+        // 页面路由
+        function showPage(id) {
+            document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById('page_' + id).style.display = 'block';
+            event.currentTarget.classList.add('active');
+            applyGlobalLang(); // 刷新翻译
+        }
+
+        // 模拟 OCR 智能识别
+        document.getElementById('dropZone').onclick = function() {
+            const res = document.getElementById('ocrRes');
+            const rep = document.getElementById('riskReport');
+            const lang = document.getElementById('langSelect').value;
+            const dict = translations[lang] || translations['en'];
+
+            res.innerText = dict['res_mock'];
+            
+            setTimeout(() => {
+                res.innerHTML = `<strong>[Detected: Mixed Language]</strong><br>Property: No. 88 Global Ave.<br>Clause: Lessor can terminate immediately without refund.`;
+                rep.innerHTML = `
+                    <div class="card" style="border-left: 5px solid var(--danger); background: #fef2f2;">
+                        <h4 style="color:var(--danger)">${dict['risk_high'] || 'Risk'}</h4>
+                        <p style="font-size:13px; margin: 10px 0;">Termination clause violates international consumer protection standards (Unfair Terms).</p>
+                        <h4 style="color:var(--success)">${dict['risk_fix'] || 'Fix'}</h4>
+                        <p style="font-size:13px; background:white; padding:10px; border-radius:5px; border:1px solid #e2e8f0;">"Either party may terminate with a 30-day written notice."</p>
+                    </div>
+                `;
+            }, 1500);
+        };
