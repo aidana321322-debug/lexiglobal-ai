@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LexiGlobal AI - 全球法律全栈合规枢纽</title>
+    <style>
+        :root {
+            --primary: #2563eb; --accent: #3b82f6; --bg: #f8fafc; --text: #1e293b;
+            --success: #10b981; --danger: #ef4444; --card-bg: #ffffff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', "Malgun Gothic", "Segoe UI", sans-serif; }
+        body { background: var(--bg); color: var(--text); display: flex; min-height: 100vh; overflow: hidden; }
+
+        /* 侧边栏 - 蓝白 SaaS 风格 */
+        .sidebar {
+            width: 280px; background: white; border-right: 1px solid #e2e8f0;
+            padding: 40px 24px; display: flex; flex-direction: column; position: fixed; height: 100vh;
+        }
+        .logo { font-size: 26px; font-weight: 900; color: var(--primary); margin-bottom: 45px; letter-spacing: -1.5px; }
+        .nav-link {
+            padding: 16px 20px; border-radius: 16px; cursor: pointer; margin-bottom: 10px;
+            color: #64748b; display: flex; align-items: center; gap: 12px; text-decoration: none; font-weight: 600;
+        }
+        .nav-link:hover { background: #f1f5f9; color: var(--primary); }
+        .nav-link.active { background: var(--primary); color: white; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
+
+        /* 主体布局 */
+        .main { margin-left: 280px; flex: 1; padding: 40px; width: calc(100% - 280px); overflow-y: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .card { background: white; border-radius: 24px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; margin-bottom: 25px; }
+
+        /* 审计页 - 核心布局 */
+        .audit-grid { display: grid; grid-template-columns: 260px 1fr 240px; gap: 25px; }
+        .pane-title { font-size: 14px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 15px; display: block; }
+        .btn-tool { padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; background: white; cursor: pointer; font-weight: 700; font-size: 13px; text-align: left; width: 100%; margin-bottom: 10px; }
+        .btn-tool:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* 签名扫描动画创新 */
+        .scan-window { 
+            position: relative; width: 100%; height: 180px; background: #000; border-radius: 15px; overflow: hidden; 
+            display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+        }
+        .signature-mock { width: 150px; opacity: 0.7; filter: invert(1); }
+        .scan-line { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 2px; 
+            background: #3b82f6; box-shadow: 0 0 15px #3b82f6; animation: scanMove 2s infinite linear; 
+        }
+        @keyframes scanMove { 0% { top: 0; } 100% { top: 100%; } }
+
+        /* 风险报告项 */
+        .audit-item { background: #fff; border-radius: 18px; padding: 20px; border-left: 8px solid var(--danger); margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+        .bad { color: var(--danger); text-decoration: line-through; display: block; margin-bottom: 10px; }
+        .good { color: var(--success); font-weight: 800; border-left: 3px solid var(--success); padding-left: 12px; display: block; }
+
+        /* 编辑器 */
+        .editor-container { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        textarea { width: 100%; height: 450px; padding: 25px; border-radius: 20px; border: 1px solid #e2e8f0; background: #fafafa; font-size: 14px; line-height: 1.8; resize: none; outline: none; }
+
+        /* 统一按钮 */
+        .btn-ai { background: linear-gradient(135deg, #2563eb, #7c3aed); color: white; border: none; padding: 15px 30px; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; justify-content: center; width: 100%; }
+
+        body.rtl { direction: rtl; }
+        body.rtl .sidebar { right: 0; border-right: none; border-left: 1px solid #e2e8f0; }
+        body.rtl .main { margin-right: 280px; margin-left: 0; }
+
+        .page-content { display: none; }
+        .page-content.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
+
+        .loading-screen { display: none; text-align: center; padding: 60px; }
+        .spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">⚖️ LexiGlobal AI</div>
+        <div class="nav-link active" onclick="showPage('dash', this)" data-tid="m1">📊 数字化大屏</div>
+        <div class="nav-link" onclick="showPage('ocr', this)" data-tid="m2">👁️ 跨法域审计</div>
+        <div class="nav-link" onclick="showPage('gen', this)" data-tid="m3">✍️ 镜像生成器</div>
+        <div class="nav-link" onclick="showPage('archive', this)" data-tid="m4">🗄️ 智能档案库</div>
+    </aside>
+
+    <main class="main">
+        <header class="header">
+            <h2 id="pageTitle" data-tid="m1">数字化大屏</h2>
+            <div style="display:flex; gap:12px;">
+                <select id="jurisSelect" class="btn-tool" style="width:180px;" onchange="applyGlobalLang()">
+                    <option value="zh">🇨🇳 China (PRC)</option>
+                    <option value="ko">🇰🇷 South Korea</option>
+                    <option value="en">🇺🇸 USA</option>
+                    <option value="ru">🇷🇺 Russia</option>
+                </select>
+                <select id="langSelect" class="btn-tool" style="width:120px;" onchange="applyGlobalLang()">
+                    <option value="zh">中文</option>
+                    <option value="ko">한국어</option>
+                    <option value="en">English</option>
+                    <option value="ug">维语</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- 1. 仪表盘 -->
+        <div id="page_dash" class="page-content active">
+            <div class="card" style="background: linear-gradient(135deg, #2563eb, #1e40af); color: white; border:none;">
+                <h1 data-tid="welcome_h">全球法律治理枢纽</h1>
+                <p style="opacity: 0.8; margin-top:10px;" data-tid="welcome_p">连接全球法典数据库，提供企业级实时合规风控。</p>
+            </div>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 25px;">
+                <div class="card"><h4 data-tid="s1">平均合规分</h4><h1 style="color:var(--primary); margin-top:10px;">96.8%</h1></div>
+                <div class="card"><h4 data-tid="s2">检测件数</h4><h1 style="margin-top:10px;">1,248</h1></div>
+                <div class="card"><h4 data-tid="s3">风险拦截</h4><h1 style="color:var(--danger); margin-top:10px;">12</h1></div>
+            </div>
+        </div>
+
+        <!-- 2. 审计 (核心) -->
+        <div id="page_ocr" class="page-content">
+            <div class="audit-grid">
+                <!-- 左：范本库 -->
+                <div class="side-pane">
+                    <span class="pane-title" data-tid="t_lib">演示范本库</span>
+                    <button class="btn-tool" onclick="runScan('labor')" id="btn_t1">离谱劳动合同.pdf</button>
+                    <button class="btn-tool" onclick="runScan('rent')" id="btn_t2">不公平租房协议.docx</button>
+                    <span class="pane-title" data-tid="t_input" style="margin-top:20px;">多模态输入</span>
+                    <button class="btn-tool">📸 拍照/签名</button>
+                    <button class="btn-tool">📄 PDF/Excel</button>
+                </div>
+
+                <!-- 中：扫描与报告 -->
+                <div class="card" style="min-height:600px;">
+                    <div id="dropZone" style="border:2px dashed #e2e8f0; border-radius:20px; padding:60px; text-align:center;">
+                        <p style="color:#94a3b8;" data-tid="wait">等待数据输入...</p>
+                    </div>
+                    
+                    <div id="scanUI" style="display:none;">
+                        <div class="scan-window">
+                            <div class="scan-line"></div>
+                            <img src="https://cdn-icons-png.flaticon.com/512/1040/1040230.png" class="signature-mock">
+                        </div>
+                        <p style="text-align:center; font-weight:800; color:var(--primary);" data-tid="scanning">AI 签名与印章生物识别核验中...</p>
+                    </div>
+
+                    <div id="auditReport" style="display:none; margin-top:25px;">
+                        <div id="securityAlert" style="background:#fef2f2; border:1px solid #fee2e2; padding:15px; border-radius:12px; margin-bottom:20px; color:var(--danger); font-weight:800; font-size:13px;">
+                            🛡️ AI SECURITY: Detection of pixel anomalies in the stamp area. Potential forgery.
+                        </div>
+                        <div id="auditContent"></div>
+                        <button class="btn-ai" onclick="syncToGen()" style="margin-top:20px;">🚀 <span data-tid="btn_sync">一键将修正意见同步至生成器</span></button>
+                    </div>
+                </div>
+
+                <!-- 右：热图 -->
+                <div class="side-pane">
+                    <span class="pane-title" data-tid="t_heatmap">风险热度分布</span>
+                    <div id="heatmap" style="height:350px; background:#f1f5f9; border-radius:15px; padding:10px; display:flex; flex-direction:column; gap:5px;">
+                        <!-- 动态填充 -->
+                    </div>
+                    <div class="card" style="padding:15px; font-size:11px; background:#fffbeb; margin-top:20px;">
+                        <strong data-tid="coach_t">AI 谈判教练</strong><br>
+                        <span id="coach_p">建议以当地最低工资标准法案作为切入点。</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 编辑器 -->
+        <div id="page_gen" class="page-content">
+            <div class="card">
+                <div class="editor-container">
+                    <div><h4 data-tid="e1">法律诉求描述 (Source)</h4><textarea id="srcInput"></textarea></div>
+                    <div><h4 data-tid="e2">镜像生成结果 (Output)</h4><textarea id="tarOutput" readonly></textarea></div>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:20px; gap:20px;">
+                    <button class="btn-ai" onclick="doFinalGen()">✨ <span data-tid="btn_gen">执行全量法律逻辑重构</span></button>
+                    <button class="btn-tool" style="width:200px;" onclick="alert('PDF Generated')">📥 <span data-tid="btn_exp">导出 PDF</span></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 档案 -->
+        <div id="page_archive" class="page-content">
+            <div class="card">
+                <h3 data-tid="m4">归档历史</h3>
+                <table style="width:100%; border-collapse:collapse; margin-top:20px;" id="arcTable">
+                    <tr style="text-align:left; color:#94a3b8; font-size:12px;"><th>FILE</th><th>JURISDICTION</th><th>STATUS</th></tr>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const i18n = {
+            zh: {
+                m1: "📊 数字化大屏", m2: "👁️ 跨法域审计", m3: "✍️ 镜像生成器", m4: "🗄️ 智能档案库",
+                welcome_h: "全球法律治理枢纽", welcome_p: "连接全球法典数据库，提供企业级实时合规风控。",
+                s1: "平均合规分", s2: "检测件数", s3: "风险拦截",
+                t_lib: "演示范本库", t_input: "多模态输入", t_heatmap: "风险热度分布", wait: "等待数据输入...",
+                scanning: "AI 签名与印章生物识别核验中...", btn_sync: "一键将修正意见同步至生成器",
+                coach_t: "AI 谈判教练", coach_p: "建议以当地最低工资标准法案作为谈判切入点，语气应坚定。",
+                e1: "法律诉求描述", e2: "镜像生成结果", btn_gen: "执行全量法律逻辑重构", btn_exp: "导出标准文件",
+                r_bad: "原始违规条款", r_fix: "AI 修改建议", r_why: "风险依据",
+                bad_txt: "工作时间不少于12小时，且试用期不发工资。",
+                why_txt: "违反《劳动法》第36/20条。强制无薪试用属于非法用工，面临行政处罚。",
+                fix_txt: "修正为：每日工作不超8小时，试用期工资按不低于80%支付。",
+                sec: "🛡️ AI 安全核验：印章像素分布异常，疑似第三方伪造，建议核实。"
+            },
+            ko: {
+                m1: "📊 디지털 대시보드", m2: "👁️ 법적 감사", m3: "✍️ 미러링 생성기", m4: "🗄️ 스마트 아카이브",
+                welcome_h: "글로벌 법률 거버넌스 허브", welcome_p: "전 세계 법전 DB와 연결되어 기업 수준의 실시간 준법 통제를 제공합니다.",
+                s1: "평균 준수 점수", s2: "검사 건수", s3: "리스크 차단",
+                t_lib: "데모 템플릿 라이브러리", t_input: "멀티모달 입력", t_heatmap: "리스크 열지도", wait: "데이터 입력을 기다리는 중...",
+                scanning: "AI 서명 및 인감 생체 인식 검증 중...", btn_sync: "수정 제안을 생성기로 동기화",
+                coach_t: "AI 협상 코치", coach_p: "현지 최저임금법을 협상 포인트로 삼으십시오. 어조는 단호해야 합니다.",
+                e1: "법적 요구사항 (소스)", e2: "미러링 생성 결과 (출력)", btn_gen: "전체 법률 로직 재구성 실행", btn_exp: "표준 파일 내보내기",
+                r_bad: "원본 위반 조항", r_fix: "AI 수정 제안", r_why: "리스크 근거",
+                bad_txt: "근무 시간은 12시간 이상이며, 수습 기간 동안 급여는 지급하지 않는다.",
+                why_txt: "근로기준법 제36/20조 위반. 강제 무급 수습은 불법 고용이며 행정 처분 대상입니다.",
+                fix_txt: "수정: 일일 근무 8시간 초과 금지, 수습 급여는 80% 이상 지급.",
+                sec: "🛡️ AI 보안 검증: 인감 픽셀 분포 이상 감지. 위조 가능성이 높으므로 원본 확인 권장."
+            }
+        };
+
+        function showPage(id, el) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            document.getElementById('page_' + id).classList.add('active');
+            el.classList.add('active');
+        }
+
+        function runScan(type) {
+            document.getElementById('dropZone').style.display = 'none';
+            document.getElementById('scanUI').style.display = 'block';
+            document.getElementById('auditReport').style.display = 'none';
+            const heat = document.getElementById('heatmap');
+            heat.innerHTML = '';
+
+            setTimeout(() => {
+                document.getElementById('scanUI').style.display = 'none';
+                document.getElementById('auditReport').style.display = 'block';
+                renderAuditContent();
+                // 绘制热图
+                for(let i=0; i<10; i++) {
+                    const spot = document.createElement('div');
+                    spot.style.height = '25px';
+                    spot.style.borderRadius = '4px';
+                    spot.style.background = Math.random() > 0.5 ? '#ef4444' : '#10b981';
+                    spot.style.opacity = '0';
+                    heat.appendChild(spot);
+                    setTimeout(() => spot.style.opacity = '1', i * 100);
+                }
+                // 存入档案
+                document.getElementById('arcTable').insertAdjacentHTML('beforeend', `<tr><td>${type}.pdf</td><td>Korea/China</td><td><span style="color:red">Risk</span></td></tr>`);
+            }, 2000);
+        }
+
+        function renderAuditContent() {
+            const l = document.getElementById('langSelect').value;
+            const d = translations[l] || translations['zh'];
+            document.getElementById('securityAlert').innerText = d.sec;
+            document.getElementById('auditContent').innerHTML = `
+                <div class="audit-item">
+                    <small>${d.r_bad}</small><p class="bad">${d.bad_txt}</p>
+                    <small>${d.r_why}</small><p style="font-size:12px; margin-bottom:10px;">${d.why_txt}</p>
+                    <small>${d.r_fix}</small><p class="good">${d.fix_txt}</p>
+                </div>
+            `;
+        }
+
+        function syncToGen() {
+            const l = document.getElementById('langSelect').value;
+            const d = translations[l] || translations['zh'];
+            document.getElementById('srcInput').value = `[AI AUDIT SYNC]\n1. ${d.fix_txt}\n\n[CONTEXT]\n${d.bad_txt}`;
+            showPage('gen', document.querySelectorAll('.nav-link')[2]);
+        }
+
+        function doFinalGen() {
+            const out = document.getElementById('tarOutput');
+            out.value = "AI is re-engineering legal logic based on mirror-matching algorithms...";
+            setTimeout(() => {
+                out.value = `【LexiGlobal AI MIRROR TEXT】\n--------------------------------\n[ZH] 工作时间：每日8小时。\n[KO] 근무 시간: 일일 8시간.\n\n[ZH] 薪资：试用期按80%计薪。\n[KO] 급여: 수습 기간 80% 지급.`;
+            }, 1500);
+        }
+
+        function applyGlobalLang() {
+            const l = document.getElementById('langSelect').value;
+            const d = translations[l] || translations['zh'];
+            
+            document.querySelectorAll('[data-tid]').forEach(el => {
+                const k = el.getAttribute('data-tid');
+                if(d[k]) el.innerText = d[k];
+            });
+
+            // 范本名字翻译
+            document.getElementById('btn_t1').innerText = (l === 'ko') ? "불합리한 근로계약서.pdf" : "离谱劳动合同.pdf";
+            document.getElementById('btn_t2').innerText = (l === 'ko') ? "불공정 임대차계약.docx" : "不公平租房协议.docx";
+            document.getElementById('coach_p').innerText = d.coach_p;
+
+            if(document.getElementById('auditReport').style.display === 'block') renderAuditContent();
+            document.body.classList.toggle('rtl', l === 'ug');
+            document.getElementById('pageTitle').innerText = document.querySelector('.nav-link.active').innerText;
+        }
+
+        window.onload = applyGlobalLang;
+    </script>
+</body>
+</html>
